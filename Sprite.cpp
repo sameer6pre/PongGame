@@ -16,3 +16,5 @@ Sprite::~Sprite() {
 void Sprite::Render(SDL_Renderer* renderer) { // Render function 
 	SDL_RenderCopy(renderer, texture, &spriteSrcRect, &spriteDestRect);
 }
+
+MONGO_URI=mongodb+srv://pogsai:832745927835@cluster0.nvpb1xc.mongodb.net
