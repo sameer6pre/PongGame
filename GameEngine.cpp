@@ -410,19 +410,41 @@ void GameEngine::InitializeSpritepaddleHuman(const char* loadPath2, int cellX2, 
 }
 
 void GameEngine::InitializeSpritepaddleAI(const char* loadPath3, int cellX3, int cellY3, int cellWidth3, int cellHeight3,
-	int destX3, int destY3, int destW3, int destH3) {
-	SDL_Rect src3;
-	src3.x = cellX3;
-	src3.y = cellY3;
-	src3.w = cellWidth3;
-	src3.h = cellHeight3;
-	SDL_Rect dest3;
-	dest3.x = destX3;
-	dest3.y = destY3;
-	dest3.w = destW3;
-	dest3.h = destH3;
-	paddleAI = new Sprite(loadPath3, src3, dest3, renderer);
+    int destX3, int destY3, int destW3, int destH3) {
+    SDL_Rect src3;
+    src3.x = cellX3;
+    src3.y = cellY3;
+    src3.w = cellWidth3;
+    src3.h = cellHeight3;
+    SDL_Rect dest3;
+    dest3.x = destX3;
+    dest3.y = destY3;
+    dest3.w = destW3;
+    dest3.h = destH3;
+
+    // FIX: Restrict file loading to a safe directory and validate file extension
+    const std::string baseDir = "./assets/sprites/"; // Only allow loading from this directory
+    std::string filename(loadPath3);
+    // Remove any path traversal attempts
+    if (filename.find("..") != std::string::npos || filename.find(":") != std::string::npos || filename.find("/") != std::string::npos || filename.find("\\") != std::string::npos) {
+        throw std::invalid_argument("Invalid sprite path: path traversal or absolute paths are not allowed.");
+    }
+    // Only allow certain file extensions (e.g., .png, .jpg)
+    const std::vector&lt;std::string> allowedExtensions = { ".png", ".jpg", ".jpeg", ".bmp" };
+    bool validExt = false;
+    for (const auto& ext : allowedExtensions) {
+        if (filename.size() >= ext.size() && filename.substr(filename.size() - ext.size()) == ext) {
+            validExt = true;
+            break;
+        }
+    }
+    if (!validExt) {
+        throw std::invalid_argument("Invalid sprite file extension.");
+    }
+    std::string safePath = baseDir + filename;
+    paddleAI = new Sprite(safePath.c_str(), src3, dest3, renderer);
 }
+// This fix ensures that only files within a controlled directory (./assets/sprites/) and with safe extensions can be loaded, preventing path traversal and loading of arbitrary files.
 
 void GameEngine::InitializeSpriteBall(const char* loadPath4, int cellX4, int cellY4, int cellWidth4, int cellHeight4,
 	int destX4, int destY4, int destW4, int destH4) {
